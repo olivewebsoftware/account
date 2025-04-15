@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Error</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="assets/logo.png">
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+    <div class="mainregister">
+        <h1 id="heading" style="font-weight: normal;">Account error</h1>
+        <p>We're having trouble accessing your account. This error usually happens if a deactivated account
+        wasn't signed out or you typed your username wrong. Please try logging in again. If the issue persists, try
+        clearing your cookies.</p>
+        <button id="button">Sign out</button><br>
+    </div>
+
+    <script> 
+        function optimizeForMobile() {
+            if (/Android|iPhone|iPad|iPod|KaiOS/i.test(navigator.userAgent)) {
+                document.querySelector('.content-left').style.display = 'none';
+                document.querySelector('.mainregister').style.margin = 'auto';
+                document.querySelector('.mainregister').style.position = 'absolute';
+                document.querySelector('.mainregister').style.top = '50%';
+                document.querySelector('.mainregister').style.left = '50%';
+                document.querySelector('.mainregister').style.transform = 'translate(-50%, -50%)';
+                document.querySelector('.mainregister').style.width = '90%';
+            }
+        }
+
+        function signOut() {
+            window.location.href = 'http://account.olivewebsoftware.com/signout.html';
+        }
+    
+        document.getElementById('button').addEventListener('click', signOut);
+    </script>     
+</body>
+</html>

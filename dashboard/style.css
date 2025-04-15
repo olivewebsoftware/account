@@ -1,0 +1,55 @@
+body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(to right, #aaa, #fff);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+  
+  .dashboard {
+    background: white;
+    width: 70%;
+    padding: 40px;
+    display: flex;
+    justify-content: space-between;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  }
+  
+  .account-info h1 {
+    margin: 0;
+    font-size: 32px;
+  }
+  
+  .account-info p {
+    margin: 8px 0;
+    font-size: 18px;
+  }
+  
+  .security-options h2 {
+    margin-bottom: 20px;
+    font-size: 24px;
+  }
+  
+  .option {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    margin-bottom: 15px;
+  }
+  
+  .option img {
+    width: 30px;
+    margin-right: 10px;
+  }
+  
+  .option span {
+    font-size: 18px;
+  }
+  
+  .option.delete img {
+    width: 30px;
+    margin-right: 10px;
+  }
+  

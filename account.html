@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Sign Into OliveWeb</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="assets/logo.png">
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+    <div class="mainregister">
+        <h1 id="heading" style="font-weight: normal;">Sign Into OliveWeb:</h1>
+        <p id="referrerText"></p>
+        <p>Username:</p>
+        <input id="username" type="text" name="filename"><br>
+        <p>Password:</p>
+        <input id="password" type="password" name="data"><br><br>
+        <button id="button">Sign in</button><br>
+        <p>No account yet?</p>
+        <a href="http://olivewebsoftware.com/create/">Create an Account</a>
+    </div>
+
+    <div id="messageContainer" class="mainregister" style="display: none;">
+        <h1 id="messageHeading" style="font-weight: normal;"></h1>
+        <p id="messageText"></p>
+        <button id="closeMessage" class="button">Close</button>
+    </div>
+
+    <script>
+        function setCookie(name, value) {
+            document.cookie = `${name}=${value}; path=/; SameSite=Lax; expires=Fri, 31 Dec 9999 23:59:59 GMT`;
+        }
+    
+        function getCookie(name) {
+            const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+            return match ? match[2] : null;
+        }
+    
+        function getReferrer() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('referrer');
+        }
+    
+        function updatePageBasedOnReferrer() {
+            const referrer = getReferrer();
+            const referrerText = document.getElementById('referrerText');
+    
+            switch (referrer) {
+                case 'messengerweb':
+                    document.body.style.backgroundImage = "url('assets/messenger-bg.png')";
+                    referrerText.textContent = "to continue to Messenger Web";
+                    break;
+                case 'games':
+                    document.body.style.backgroundImage = "url('assets/games-bg.png')";
+                    referrerText.textContent = "to continue to Games";
+                    break;
+                case 'notes':
+                    document.body.style.backgroundImage = "url('assets/notes-bg.png')";
+                    referrerText.textContent = "to continue to Notes";
+                    break;
+                default:
+                    if (getCookie('username') && getCookie('password')) {
+                        window.location.href = 'http://account.olivewebsoftware.com/dashboard';
+                    }
+            }
+    
+            optimizeForMobile();
+        }
+    
+        function optimizeForMobile() {
+            if (/Android|iPhone|iPad|iPod|KaiOS/i.test(navigator.userAgent)) {
+                document.querySelector('.content-left').style.display = 'none';
+                document.querySelector('.mainregister').style.margin = 'auto';
+                document.querySelector('.mainregister').style.position = 'absolute';
+                document.querySelector('.mainregister').style.top = '50%';
+                document.querySelector('.mainregister').style.left = '50%';
+                document.querySelector('.mainregister').style.transform = 'translate(-50%, -50%)';
+                document.querySelector('.mainregister').style.width = '90%';
+            }
+        }
+    
+        function login() {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+    
+            if (!username || !password) {
+                showMessage('Missing Information', 'Please enter both username and password.');
+                return;
+            }
+    
+            fetch('http://68.108.66.195:5000/connect/newlogin-test.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams({
+                    'filename': username,
+                    'data': password,
+                    'submit': 'true'
+                })
+            })
+            .then(response => response.text())
+            .then(data => {
+                switch (data.trim()) {
+                    case 'Login Success':
+                        setCookie('username', username);
+                        setCookie('password', password);
+                        const referrer = getReferrer();
+                        if (referrer === 'messengerweb') {
+                            window.location.href = 'http://webmessenger.olivewebsoftware.com';
+                        } else if (referrer === 'games') {
+                            window.location.href = 'http://games.olivewebsoftware.com';
+                        } else {
+                            window.location.href = 'http://account.olivewebsoftware.com/dashboard';
+                        }
+                        break;
+    
+                    case 'Incorrect password':
+                        showMessage('Incorrect password', 'Please try again.');
+                        break;
+    
+                    case 'Account doesn\'t exist':
+                        showMessage('Account doesn\'t exist', 'There is no account on record with this username.');
+                        break;
+    
+                    case 'Restricted':
+                        showMessage('Account Restricted', 'Sign in is unavailable.');
+                        break;
+    
+                    case 'Banned':
+                        showMessage('Account Terminated', 'This account has been terminated for violating the Terms of Service.');
+                        break;
+    
+                    case 'Device Banned':
+                        showMessage('Device Banned', 'Your IP address has been blocked due to repeated Terms of Service violations.');
+                        break;
+    
+                    default:
+                        alert('Unexpected response: ' + data);
+                }
+            })
+            .catch(error => {
+                showMessage('Connection failed', 'We couldn\'t connect to the server. Please try again later.');
+            });
+        }
+    
+        function showMessage(heading, message) {
+            document.querySelector('.mainregister').style.display = 'none';
+            const messageContainer = document.getElementById('messageContainer');
+            document.getElementById('messageHeading').textContent = heading;
+            document.getElementById('messageText').innerHTML = message;
+            messageContainer.style.display = 'block';
+    
+            document.getElementById('closeMessage').addEventListener('click', function () {
+                messageContainer.style.display = 'none';
+                document.querySelector('.mainregister').style.display = 'block';
+            });
+        }
+    
+        // Add Enter key support
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter') {
+                login();
+            }
+        });
+    
+        document.getElementById('button').addEventListener('click', login);
+    
+        window.onload = updatePageBasedOnReferrer;
+
+        document.addEventListener("DOMContentLoaded", function () {
+    // Check if the URL has a 'referrer' parameter
+        const urlParams = new URLSearchParams(window.location.search);
+            if (!urlParams.has("referrer")) {
+                // Select a random number between 1 and 4
+                const randomBg = Math.floor(Math.random() * 4) + 1;
+                // Set the background image
+                document.body.style.backgroundImage = `url('assets/background/${randomBg}.jpg')`;
+                ocument.body.style.backgroundSize = "cover"; // Optional, to fit the screen
+                document.body.style.backgroundPosition = "center"; // Optional, to center the image
+            }
+        });
+    </script>     
+</body>
+</html>
